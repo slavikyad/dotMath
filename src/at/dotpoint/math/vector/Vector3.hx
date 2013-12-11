@@ -117,6 +117,16 @@ class Vector3 implements IVector3
 		}
 	}
 	
+	public function set( x:Float, y:Float, z:Float, ?w:Float ):Void
+	{
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		
+		if( w != null )
+			this.w = w;
+	}
+	
 	// ---------------------------------------- //
 	// ---------------------------------------- //
 	
@@ -253,4 +263,50 @@ class Vector3 implements IVector3
 		
 		return true;
 	}
+	
+	
+	/**
+	 * 
+	 */
+	public static function project( a:Vector3, b:Vector3, ?output:Vector3 ):Vector3
+	{
+		if ( output == null ) output = new Vector3();
+		
+		var d:Float = Vector3.dot( a, b );
+		var d_div:Float = d / a.lengthSq();
+		
+		return Vector3.scale( a, d_div, output );
+	}
+	 
+	/**
+	 * Applies Gram-Schmitt Ortho-normalization to the given set of input objects.
+	 */
+	/*
+	    for (int i = 0; i < vecs.length; ++ i) {
+			Vector3 accum = new Vector3(0.0, 0.0, 0.0);
+	
+			for(int j = 0; j < i; ++ j)
+				accum.add(Vector3.projectAndCreate(vecs[i], vecs[j]));
+	
+			vecs[i].subtract(accum).normalize();
+		}
+	 * 
+	 */
+	public static function orthoNormalize( vectors:Array<Vector3> ):Void 
+	{
+		for( i in 0...vectors.length )
+		{
+			var sum:Vector3 = new Vector3(); 
+			
+			for( j in 0...i )
+			{
+				var projected:Vector3 = Vector3.project( vectors[i], vectors[j] );
+				Vector3.add( sum, projected, sum );
+			}
+			
+			Vector3.subtract( vectors[i], sum, vectors[i] ).normalize();			
+		}	
+	}
+
+	
 }
