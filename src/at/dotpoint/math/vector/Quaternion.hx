@@ -104,51 +104,24 @@ class Quaternion
 	}
 	
 	/**
-	 *  Vector3 forward = lookAt.clone(); 
-		Vector3 up = upDirection.clone();
-		Vector3[] vecs = new Vector3[2];
-		vecs[0] = forward; 
-		vecs[1] = up;
-
-		Vector3.orthoNormalize(vecs);
-		Vector3 right = Vector3.crossAndCreate(forward, up);
-		fromAxes(right, up, forward);
-		if (isCamera) {
-				return this;
-		} else {
-				return inverse();
-		}
+	 * 
 	 * @param	x
 	 * @param	y
 	 * @param	z
 	 */
 	public function lookAt( lookTo:Vector3, up:Vector3 ):Void
-	{
-		/*trace("");
-		trace("---------------------------");
-		trace("t: " + lookTo );	
-		trace("u: " + up );	*/
+	{		
+		lookTo.normalize();	// same as: Vector3.orthoNormalize( [lookTo, up] );
+		Vector3.subtract( up, Vector3.project( up, lookTo ), up ).normalize();	
 		
-		//lookTo.normalize();
-		//Vector3.subtract( up, Vector3.project( up, lookTo ), up ).normalize();	
-		
-		Vector3.orthoNormalize( [lookTo, up] );		
-	
 		var right:Vector3 = Vector3.cross( lookTo, up );
 			right.z *= -1;
 			right.x *= -1;
-			right.y *= -1;
-			
-		up = Vector3.cross( lookTo, right );	
-			
-		/*trace("t: " + lookTo );	
-		trace("u: " + up );	
-		trace("r: " + right );	
+			right.y *= -1;			
+			right.normalize();
 		
-		trace("");
-		trace( this.getAxisX() );
-		trace( this.getAxisY() );
-		trace( this.getAxisZ() );*/
+		up = Vector3.cross( lookTo, right );	
+		up.normalize();
 		
 		Quaternion.setAxis(right, up, lookTo, this );
 	}	
