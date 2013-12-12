@@ -43,7 +43,10 @@ class Vector3 implements IVector3
 	 */
 	public function normalize():Void
 	{
-		var k:Float = 1. / this.length();
+		var l:Float = this.length();
+		if( l == 0 ) return;
+		
+		var k:Float = 1. / l;
 		
 		this.x *= k;
 		this.y *= k;
@@ -68,20 +71,18 @@ class Vector3 implements IVector3
 	
 	// ---------------------------------------- //
 	// ---------------------------------------- //
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public function toVector():haxe.ds.Vector<Float>
+
+	public function toArray( ?w:Bool = false ):Array<Float>
 	{
-		var v:haxe.ds.Vector<Float> = new haxe.ds.Vector<Float>( 4 );
-			v[0] = this.x;
-			v[1] = this.y;
-			v[2] = this.z;
-			v[3] = this.w;
-			
-		return v;
+		var output:Array<Float> = new Array<Float>();		
+			output[0] = this.x;
+			output[1] = this.y;
+			output[2] = this.z;
+		
+		if( w )
+			output[3] = this.w;
+		
+		return output;
 	}
 	
 	/**
@@ -272,8 +273,11 @@ class Vector3 implements IVector3
 	{
 		if ( output == null ) output = new Vector3();
 		
+		var l:Float = a.lengthSq();
+		if( l == 0 ) throw "undefined result";
+		
 		var d:Float = Vector3.dot( a, b );
-		var d_div:Float = d / a.lengthSq();
+		var d_div:Float = d / l;
 		
 		return Vector3.scale( a, d_div, output );
 	}
