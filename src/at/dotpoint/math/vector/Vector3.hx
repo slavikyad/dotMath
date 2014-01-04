@@ -43,7 +43,10 @@ class Vector3 implements IVector3
 	 */
 	public function normalize():Void
 	{
-		var k:Float = 1. / this.length();
+		var l:Float = this.length();
+		if( l == 0 ) return;
+		
+		var k:Float = 1. / l;
 		
 		this.x *= k;
 		this.y *= k;
@@ -68,20 +71,18 @@ class Vector3 implements IVector3
 	
 	// ---------------------------------------- //
 	// ---------------------------------------- //
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public function toVector():haxe.ds.Vector<Float>
+
+	public function toArray( ?w:Bool = false ):Array<Float>
 	{
-		var v:haxe.ds.Vector<Float> = new haxe.ds.Vector<Float>( 4 );
-			v[0] = this.x;
-			v[1] = this.y;
-			v[2] = this.z;
-			v[3] = this.w;
-			
-		return v;
+		var output:Array<Float> = new Array<Float>();		
+			output[0] = this.x;
+			output[1] = this.y;
+			output[2] = this.z;
+		
+		if( w )
+			output[3] = this.w;
+		
+		return output;
 	}
 	
 	/**
@@ -115,6 +116,16 @@ class Vector3 implements IVector3
 			default:
 				throw "out of bounds";
 		}
+	}
+	
+	public function set( x:Float, y:Float, z:Float, ?w:Float ):Void
+	{
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		
+		if( w != null )
+			this.w = w;
 	}
 	
 	// ---------------------------------------- //
@@ -253,4 +264,53 @@ class Vector3 implements IVector3
 		
 		return true;
 	}
+	
+	
+	/**
+	 * 
+	 */
+	public static function project( a:Vector3, b:Vector3, ?output:Vector3 ):Vector3
+	{
+		if ( output == null ) output = new Vector3();
+		
+		var l:Float = a.lengthSq();
+		if( l == 0 ) throw "undefined result";
+		
+		var d:Float = Vector3.dot( a, b );
+		var d_div:Float = d / l;
+		
+		return Vector3.scale( a, d_div, output );
+	}
+	 
+	/**
+	 * Applies Gram-Schmitt Ortho-normalization to the given set of input objects.
+	 */
+	/*
+	    for (int i = 0; i < vecs.length; ++ i) {
+			Vector3 accum = new Vector3(0.0, 0.0, 0.0);
+	
+			for(int j = 0; j < i; ++ j)
+				accum.add(Vector3.projectAndCreate(vecs[i], vecs[j]));
+	
+			vecs[i].subtract(accum).normalize();
+		}
+	 * 
+	 */
+	public static function orthoNormalize( vectors:Array<Vector3> ):Void 
+	{
+		for( i in 0...vectors.length )
+		{
+			var sum:Vector3 = new Vector3(); 
+			
+			for( j in 0...i )
+			{
+				var projected:Vector3 = Vector3.project( vectors[i], vectors[j] );
+				Vector3.add( sum, projected, sum );
+			}
+			
+			Vector3.subtract( vectors[i], sum, vectors[i] ).normalize();			
+		}	
+	}
+
+	
 }

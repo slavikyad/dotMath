@@ -17,7 +17,7 @@ class Matrix33 implements IMatrix33
 	// Constructor
 	// ************************************************************************ //	
 	
-	public function new( ?m:IMatrix44 ) 
+	public function new( ?m:IMatrix33 ) 
 	{
 		if ( m != null)	this.set33( m );
 		else 			this.toIdentity();

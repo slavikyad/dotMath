@@ -81,7 +81,7 @@ class Flash3D
 	 * @param	output
 	 * @return
 	 */
-	static public function toVector3( vector:Vector3D, output:Vector3 ):IVector3
+	static public function toVector3( vector:Vector3D, output:Vector3 ):Vector3
 	{
 		output.x = vector.x;
 		output.y = vector.y;

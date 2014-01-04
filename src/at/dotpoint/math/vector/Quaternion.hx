@@ -103,6 +103,116 @@ class Quaternion
 		return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
 	}
 	
+	/**
+	 * 
+	 * @param	x
+	 * @param	y
+	 * @param	z
+	 */
+	public function lookAt( lookTo:Vector3, up:Vector3 ):Void
+	{		
+		lookTo.normalize();	// same as: Vector3.orthoNormalize( [lookTo, up] );
+		Vector3.subtract( up, Vector3.project( up, lookTo ), up ).normalize();	
+		
+		var right:Vector3 = Vector3.cross( lookTo, up );
+			right.z *= -1;
+			right.x *= -1;
+			right.y *= -1;			
+			right.normalize();
+		
+		up = Vector3.cross( lookTo, right );	
+		up.normalize();
+		
+		Quaternion.setAxis(right, up, lookTo, this );
+	}	
+	
+	 //--------------------------------------------------
+        // Quaternion operation methods
+        //--------------------------------------------------
+        
+        /**
+         * Creates a {@link Vector3} which represents the x axis of this {@link Quaternion}.
+         * 
+         * @return {@link Vector3} The x axis of this {@link Quaternion}.
+         */
+        public function getAxisX( ?output:Vector3 ):Vector3 
+		{
+			output = output != null ? output : new Vector3();
+			
+			var fTy = 2.0 * y;
+			var fTz = 2.0 * z;
+			
+			var fTwy = fTy * w;
+			var fTwz = fTz * w;
+			var fTxy = fTy * x;
+			var fTxz = fTz * x;
+			var fTyy = fTy * y;
+			var fTzz = fTz * z;
+			
+			output.set(1 - (fTyy + fTzz), fTxy + fTwz, fTxz - fTwy);
+			
+			return output;
+        }
+
+        /**
+         * Creates a {@link Vector3} which represents the y axis of this {@link Quaternion}.
+         * 
+         * @return {@link Vector3} The y axis of this {@link Quaternion}.
+         */
+        public function getAxisY( ?output:Vector3 ):Vector3 
+		{
+			output = output != null ? output : new Vector3();
+			
+			var fTx = 2.0 * x;
+			var fTy = 2.0 * y;
+			var fTz = 2.0 * z;
+			
+			var fTwx = fTx * w;
+			var fTwz = fTz * w;
+			var fTxx = fTx * x;
+			var fTxy = fTy * x;
+			var fTyz = fTz * y;
+			var fTzz = fTz * z;
+			
+			output.set(fTxy - fTwz, 1 - (fTxx + fTzz), fTyz + fTwx);
+			
+			return output;
+        }
+
+        /**
+         * Creates a {@link Vector3} which represents the z axis of this {@link Quaternion}.
+         * 
+         * @return {@link Vector3} The z axis of this {@link Quaternion}.
+         */
+        public function getAxisZ( ?output:Vector3 ):Vector3 
+		{
+			output = output != null ? output : new Vector3();
+			
+			var fTx = 2.0 * x;
+			var fTy = 2.0 * y;
+			var fTz = 2.0 * z;
+			
+			var fTwx = fTx * w;
+			var fTwy = fTy * w;
+			var fTxx = fTx * x;
+			var fTxz = fTz * x;
+			var fTyy = fTy * y;
+			var fTyz = fTz * y;
+			
+			output.set(fTxz + fTwy, fTyz - fTwx, 1 - (fTxx + fTyy));
+			
+			return output;
+        }
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public function toString():String
+	{
+		return "[Quaternion;" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + "]";
+	}
+	
 	// ************************************************************************ //
 	// static Operations
 	// ************************************************************************ //	
@@ -193,13 +303,48 @@ class Quaternion
 	// ************************************************************************ //	
 	
 	/**
+	 * final double m00 = xx, m01 = xy, m02 = xz;
+		final double m10 = yx, m11 = yy, m12 = yz;
+		final double m20 = zx, m21 = zy, m22 = zz;
+		final double t = m00 + m11 + m22;
+	 * 
+	 * @param	x
+	 * @param	y
+	 * @param	z
+	 * @param	?output
+	 * @return
+	 */
+	public static function setAxis( x:Vector3, y:Vector3, z:Vector3, ?output:Quaternion ):Quaternion
+	{
+		output = output != null ? output : new Quaternion();
+		
+		var matrix:Matrix44 = new Matrix44();
+		
+		matrix.m11 = x.x;
+		matrix.m21 = y.x;
+		matrix.m31 = z.x;
+		
+		matrix.m12 = x.y;
+		matrix.m22 = y.y;
+		matrix.m32 = z.y;
+		
+		matrix.m13 = x.z;
+		matrix.m23 = y.z;
+		matrix.m33 = z.z;
+		
+		return Quaternion.setMatrix( matrix, output );		
+	}
+	
+	/**
 	 * set rotation around a vector.
 	 * 
 	 * @param 	axis	The vector in space it rotates around 
 	 * @param	angle	The angle in radians of the rotation.
 	 */
-	inline public static function setAxisAngle( axis:IVector3, radians:Float, output:Quaternion ):Quaternion
+	inline public static function setAxisAngle( axis:Vector3, radians:Float, output:Quaternion ):Quaternion
 	{
+		axis.normalize();
+		
 		radians = radians * 0.5;
 		
 		var sin_a:Float = Math.sin( radians );
@@ -319,50 +464,75 @@ class Quaternion
 	 */
 	inline public static function setMatrix( input:IMatrix44, output:Quaternion ):Quaternion 
 	{
-		var t:Float = input.m11 + input.m22 + input.m33 + input.m44;
+		var m00 = input.m11;
+		var m01 = input.m12; 
+		var m02 = input.m13;
 		
-		var m0:Float = input.m11; 
-		var m5:Float = input.m22; 
-		var m10:Float = input.m33;
+		var m10 = input.m21; 
+		var m11 = input.m22; 
+		var m12 = input.m23;
 		
-		var s:Float;
+		var m20 = input.m31; 
+		var m21 = input.m32; 
+		var m22 = input.m33;
 		
-		if( t > 0.0000001 )
-		{
-			s = Math.sqrt( t ) * 2;
+		var t = m00 + m11 + m22;
+		
+		//Protect the division by s by ensuring that s >= 1
+		var x;
+		var y;
+		var z;
+		var w;
+		
+		if (t >= 0) 
+		{ 
+			var s = Math.sqrt(t + 1); // |s| >= 1			
 			
-			output.x = ( input.m32 - input.m23 ) / s;
-			output.y = ( input.m13 - input.m31 ) / s;
-			output.z = ( input.m21 - input.m12 ) / s;
-			output.w = 0.25 * s;
-		}
-		else if( m0 > m5 && m0 > m10 )
-		{
-			s = Math.sqrt( 1 + m0 - m5 - m10 ) * 2;
+			w = 0.5 * s; // |w| >= 0.5
+			s = 0.5 / s; //<- This division cannot be bad
 			
-			output.x = 0.25 * s;
-			output.y = ( input.m21 + input.m12 ) / s; // transpose!
-			output.z = ( input.m13 + input.m31 ) / s;
-			output.w = ( input.m32 - input.m23 ) / s;
-		}
-		else if( m5 > m10 )
+			x = (m21 - m12) * s;
+			y = (m02 - m20) * s;
+			z = (m10 - m01) * s;
+		} 
+		else if ((m00 > m11) && (m00 > m22)) 
 		{
-			s = Math.sqrt( 1 + m5 - m0 - m10 ) * 2;			
+			var s = Math.sqrt(1.0 + m00 - m11 - m22); // |s| >= 1
 			
-			output.x = ( input.m21 + input.m12 ) / s;
-			output.y = 0.25 * s;
-			output.z = ( input.m32 + input.m23 ) / s;
-			output.w = ( input.m13 - input.m31 ) / s;			
-		}
-		else
+			x = s * 0.5; // |x| >= 0.5
+			s = 0.5 / s;
+			
+			y = (m10 + m01) * s;
+			z = (m02 + m20) * s;
+			w = (m21 - m12) * s;
+		} 
+		else if (m11 > m22) 
 		{
-			s = Math.sqrt( 1 + m10 - m5 - m0 ) * 2;			
+			var s = Math.sqrt(1.0 + m11 - m00 - m22); // |s| >= 1
 			
-			output.x = ( input.m13 + input.m31 ) / s;
-			output.y = ( input.m32 + input.m23 ) / s;
-			output.z = 0.25 * s;
-			output.w = ( input.m21 - input.m12 ) / s;
+			y = s * 0.5; // |y| >= 0.5
+			s = 0.5 / s;
+			
+			x = (m10 + m01) * s;
+			z = (m21 + m12) * s;
+			w = (m02 - m20) * s;
+		} 
+		else 
+		{
+			var s = Math.sqrt(1.0 + m22 - m00 - m11); // |s| >= 1
+			
+			z = s * 0.5; // |z| >= 0.5
+			s = 0.5 / s;
+			
+			x = (m02 + m20) * s;
+			y = (m21 + m12) * s;
+			w = (m10 - m01) * s;
 		}
+		
+		output.x = x;
+		output.y = y;
+		output.z = z;
+		output.w = w;
 		
 		return output;
 	}
@@ -418,4 +588,6 @@ class Quaternion
 		
 		return true;
 	}
+	
+	
 }
