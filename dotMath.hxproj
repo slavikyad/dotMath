@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\dotMath.swf" />
+    <movie path="unit\bin\local.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
@@ -16,7 +16,7 @@
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
-    <class path="test\src" />
+    <class path="unit\src" />
   </classpaths>
   <!-- Build options -->
   <build>
@@ -33,6 +33,7 @@
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
     <compile path="test\src\TestMain.hx" />
+    <compile path="unit\src\TestMain.hx" />
   </compileTargets>
   <!-- Assets to embed into the output SWF -->
   <library>
@@ -49,8 +50,7 @@
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
-    <option testMovie="Custom" />
-    <option testMovieCommand="localTest.bat" />
+    <option testMovie="Default" />
   </options>
   <!-- Plugin storage -->
   <storage />

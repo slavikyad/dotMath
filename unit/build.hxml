@@ -1,0 +1,43 @@
+## ################################
+## AS3
+
+-lib munit
+-lib hamcrest
+
+-main TestMain
+-cp ../src
+-cp ../lib/dotCore/src
+-cp src
+
+-swf-version 11
+-swf bin/as3_test.swf
+
+## ################################
+## JS
+
+--next
+
+-lib munit
+-lib hamcrest
+
+-main TestMain
+-cp ../src
+-cp ../lib/dotCore/src
+-cp src
+
+-js bin/js_test.js
+
+## ################################
+## NEKO
+
+--next
+
+-lib munit
+-lib hamcrest
+
+-main TestMain
+-cp ../src
+-cp ../lib/dotCore/src
+-cp src
+
+-neko bin/neko_test.n

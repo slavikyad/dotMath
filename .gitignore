@@ -1,2 +1,4 @@
 /test/build
 /test/report
+/unit/report
+/unit/bin

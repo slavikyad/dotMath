@@ -1,6 +1,8 @@
 version=2.1.0
+
 src=src
-bin=build
+bin=bin
 report=report
-hxml=test.hxml
+
 classPaths=../src
+hxml=build.hxml
