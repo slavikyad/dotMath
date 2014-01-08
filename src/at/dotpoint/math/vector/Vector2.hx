@@ -30,6 +30,25 @@ class Vector2 implements IVector2
 	// ************************************************************************ //	
 	
 	/**
+	 * 
+	 * @param	x
+	 * @param	y
+	 * @param	z
+	 * @param	?w
+	 */
+	public function set( x:Float, y:Float ):Void
+	{
+		this.x = x;
+		this.y = y;
+	}
+	
+	public function copyFrom( vector:IVector2 ):Void
+	{
+		this.x = vector.x;
+		this.y = vector.y;
+	}
+	
+	/**
 	 * rescales each component between 0 and 1 without changing its ratio to each other
 	 * [ignores the homogenous component]
 	 */
