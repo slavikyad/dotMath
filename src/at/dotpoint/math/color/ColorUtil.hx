@@ -81,4 +81,14 @@ class ColorUtil
 		return -1;
 	}
 	
+	/**
+	 * 
+	 * @param	value
+	 * @param	alpha
+	 * @return
+	 */
+	public static function toString( value:Int, alpha:Bool = true ):String
+	{
+		return StringTools.hex( value, alpha ? 8 : 6 );
+	}
 }
