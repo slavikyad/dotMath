@@ -9,6 +9,8 @@
 -cp ../lib/dotCore/src
 -cp src
 
+-D munit_server
+
 -swf-version 11
 -swf bin/as3_test.swf
 
@@ -25,6 +27,8 @@
 -cp ../lib/dotCore/src
 -cp src
 
+-D munit_server
+
 -js bin/js_test.js
 
 ## ################################
@@ -39,5 +43,7 @@
 -cp ../src
 -cp ../lib/dotCore/src
 -cp src
+
+-D munit_server
 
 -neko bin/neko_test.n

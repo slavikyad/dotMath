@@ -1,4 +1,7 @@
+/*import at.dotpoint.core.log.Log;
+import at.dotpoint.core.MainApplication;*/
 import massive.munit.client.PrintClient;
+import massive.munit.client.PrintClientBase;
 import massive.munit.client.RichPrintClient;
 import massive.munit.client.HTTPClient;
 import massive.munit.client.JUnitReportClient;
@@ -13,26 +16,38 @@ import js.Lib;
  * Auto generated Test Application.
  * Refer to munit command line tool for more information (haxelib run munit)
  */
-class TestMain
+class TestMain/* extends MainApplication*/
 {
-	static function main(){	new TestMain(); }
+	static function main()
+	{	
+		new TestMain(); 
+	}
 
 	public function new()
-	{
-		var suites = new Array<Class<massive.munit.TestSuite>>();
-		suites.push(TestSuite);
-
-		#if MCOVER
-			var client = new mcover.coverage.munit.client.MCoverPrintClient();
-			var httpClient = new HTTPClient(new mcover.coverage.munit.client.MCoverSummaryReportClient());
+	{	
+		//super();
+		/*this.initialize();*/
+		
+		#if munit_server 
+			#if MCOVER
+				var client = new mcover.coverage.munit.client.MCoverPrintClient();
+				var httpClient = new HTTPClient(new mcover.coverage.munit.client.MCoverSummaryReportClient());
+			#else
+				var client = new PrintClient();
+				var httpClient = new HTTPClient(new SummaryReportClient());
+			#end
+		
+		var runner:TestRunner = new TestRunner(client); 			
+			runner.addResultClient(httpClient);
+			runner.addResultClient(new HTTPClient(new JUnitReportClient()));
 		#else
-			var client = new PrintClient();
-			var httpClient = new HTTPClient(new SummaryReportClient());
+		var runner:TestRunner = new TestRunner( new MUnitTracePrinter() ); 
 		#end
-
-		var runner:TestRunner = new TestRunner(client); 
-		//runner.addResultClient(httpClient);
-		runner.addResultClient(new HTTPClient(new JUnitReportClient()));
+		
+		// ------------------------- //
+		
+		var suites = new Array<Class<massive.munit.TestSuite>>();
+			suites.push(TestSuite);
 		
 		runner.completionHandler = completionHandler;
 		runner.run(suites);
@@ -58,5 +73,14 @@ class TestMain
 		catch (e:Dynamic)
 		{
 		}
+	}
+}
+
+private class MUnitTracePrinter extends PrintClientBase
+{
+	public override function print(value:Dynamic):Void 
+	{
+		trace( value );
+		super.print(value);		
 	}
 }
