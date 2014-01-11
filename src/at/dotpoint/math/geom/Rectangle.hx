@@ -1,4 +1,5 @@
 package at.dotpoint.math.geom;
+
 import at.dotpoint.math.vector.Vector2;
 
 /**
@@ -189,4 +190,16 @@ class Rectangle
 		return value; 
 	}
 	
+	// ************************************************************************ //
+	// Methodes
+	// ************************************************************************ //
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public function toString():String
+	{
+		return "x:" + this.x + " y:" + this.y + " w:" + this.width + " h:" + this.height;
+	}
 }
